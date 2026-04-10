@@ -1,0 +1,15 @@
+{
+  "employee": {
+    "name": "Harihara Dhamodaran",
+    "client": "Apar Technologies, Bangalore"
+  },
+  "annual-leave-allocation": 6,
+  "medical-leave-allocation": 6,
+  "work-mode": "wfh",
+  "months": {
+    "2026-01": { "annual-leave-dates": [], "medical-leave-dates": [], "comp-off": 0 },
+    "2026-02": { "annual-leave-dates": [], "medical-leave-dates": [], "comp-off": 0 },
+    "2026-03": { "annual-leave-dates": [], "medical-leave-dates": [], "comp-off": 0 },
+    "2026-04": { "annual-leave-dates": [], "medical-leave-dates": [], "comp-off": 0 }
+  }
+}
