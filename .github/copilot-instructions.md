@@ -17,7 +17,6 @@ Monthly timesheet automation microservice. Runs on the 1st of every month (or ca
 - **Linting**: ESLint 8 + @typescript-eslint + eslint-config-prettier + eslint-plugin-import
 - **Formatting**: Prettier (single quotes, 100 print width, trailing commas)
 - **Git hooks**: Husky 9 + lint-staged (pre-commit: eslint --fix + prettier --write)
-- **CI**: GitHub Actions (lint → format check → type check → test → build)
 - **Deployment**: Docker (node:23-alpine, multi-stage build)
 
 ## npm Scripts — Always Use These
@@ -91,7 +90,7 @@ docs/               # Architecture, configuration, template mapping, troubleshoo
 All code must pass these checks before merging:
 
 1. **Pre-commit hook** (Husky + lint-staged): runs `eslint --fix` + `prettier --write` on staged `.ts` files automatically
-2. **CI pipeline** (`.github/workflows/ci.yml`): runs on push/PR to `main`
+2. **Pre-push hook** (Husky): runs the full quality pipeline before any push
    - `npm run lint` — ESLint check
    - `npm run format:check` — Prettier check (no writes)
    - `npm run type-check` — TypeScript `tsc --noEmit`
