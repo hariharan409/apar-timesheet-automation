@@ -17,14 +17,14 @@ Monthly timesheet automation microservice. Runs on the 1st of every month (or ca
 - **Linting**: ESLint 8 + @typescript-eslint + eslint-config-prettier + eslint-plugin-import
 - **Formatting**: Prettier (single quotes, 100 print width, trailing commas)
 - **Git hooks**: Husky 9 + lint-staged (pre-commit: eslint --fix + prettier --write)
-- **Deployment**: Docker (node:23-alpine, multi-stage build)
+- **Deployment**: Docker (node:23-slim, multi-stage build)
 
 ## npm Scripts — Always Use These
 
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Start dev server with nodemon + tsx |
-| `npm run build` | Compile TypeScript to `dist/` |0
+| `npm run build` | Compile TypeScript to `dist/` |
 | `npm start` | Run compiled production build |
 | `npm run run-now` | Trigger immediate timesheet generation |
 | `npm test` | Run Vitest tests |

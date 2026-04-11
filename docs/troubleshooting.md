@@ -14,7 +14,7 @@
 ### Recovery not triggering after reboot
 - Verify `restart: unless-stopped` in `docker-compose.yml`
 - Check `data/execution-state.json` — `lastProcessedMonth` should be behind current month
-- Run manually: `docker-compose exec timesheet-automation node dist/index.js --run-now`
+- Run manually: `docker-compose exec timesheet node dist/index.js --run-now`
 
 ## Email Issues
 

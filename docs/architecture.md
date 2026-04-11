@@ -29,12 +29,15 @@ Execute workflow
     │
     ├─ 1. Check state (skip if already processed)
     ├─ 2. Load timesheet-data.json
-    ├─ 3. Fetch holidays (cache or API)
-    ├─ 4. Build calendar model
-    ├─ 5. Calculate leave balances
-    ├─ 6. Generate Excel from template
-    ├─ 7. Send email (AWS SES)
-    └─ 8. Update execution state
+    ├─ 3. Parse target month
+    ├─ 4. Fetch holidays (cache or API)
+    ├─ 5. Build leave dates map
+    ├─ 6. Build calendar model
+    ├─ 7. Calculate leave balances
+    ├─ 8. Generate Excel from template
+    ├─ 9. Convert to PDF (if LibreOffice available, else keep .xlsx)
+    ├─ 10. Send email (AWS SES)
+    └─ 11. Update execution state
 ```
 
 ## Module Responsibilities
@@ -49,6 +52,7 @@ Execute workflow
 | `calendar.ts` | Build month model (pure) | None — pure function |
 | `holidays.ts` | Fetch/cache SG holidays | Network + filesystem |
 | `timesheet.ts` | Excel manipulation | Reads template, writes output |
+| `pdf.ts` | Optional xlsx → PDF conversion | Auto-detects LibreOffice |
 | `email.ts` | Send email via SMTP | Network |
 | `state.ts` | Track processed months | Filesystem (JSON) |
 | `template-map.ts` | Cell position constants | None — constants only |
@@ -61,7 +65,7 @@ timesheet-data.json ──┐
                       │
 .env (config) ────────┤
                       ▼
-holidays API ──► workflow.ts ──► timesheet.ts ──► output/timesheet-YYYY-MM.xlsx
+holidays API ──► workflow.ts ──► timesheet.ts ──► pdf.ts ──► output/timesheet-YYYY-MM.{xlsx,pdf}
    │                                │
    ▼                                ▼
 holidays-cache/              email.ts ──► AWS SES ──► recipient

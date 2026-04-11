@@ -20,8 +20,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends libreoffice-calc fonts-noto-core \
     && rm -rf /var/lib/apt/lists/*
 
-# Non-root user for security
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+# Non-root user for security (with home dir for LibreOffice profile)
+RUN groupadd -r appgroup && useradd -r -g appgroup -m appuser
 
 COPY package.json package-lock.json* ./
 RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
