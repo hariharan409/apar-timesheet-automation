@@ -37,9 +37,6 @@ npm run dev
 # Manual trigger (generate current month immediately)
 npm run run-now
 
-# Manual trigger for a specific month
-npm run run-now -- 2026-03
-
 # Production
 npm start
 
@@ -78,27 +75,34 @@ If you forget to update leave data, the timesheet will generate with zero leaves
 
 ```
 src/
-  index.ts            — entry point: recovery + scheduler
-  scheduler.ts        — cron setup
-  workflow.ts          — orchestrator (generate → email → state)
-  calendar.ts          — pure: month model builder
-  holidays.ts          — Calendarific API + cache
-  timesheet.ts         — Excel template manipulation
-  template-map.ts      — cell position constants
-  email.ts             — AWS SES SMTP
-  state.ts             — atomic JSON state
-  config.ts            — env var loading
-  logger.ts            — structured logging
-  types.ts             — TypeScript interfaces
-  template-inspector.ts — utility to verify cell positions
+  index.ts              — entry point: recovery + scheduler
+  workflow.ts            — orchestrator (generate → convert → email → state)
+  config/
+    config.ts            — env var loading
+    types.ts             — TypeScript interfaces
+  core/
+    logger.ts            — structured logging
+    state.ts             — atomic JSON state
+    scheduler.ts         — cron setup
+  calendar/
+    calendar.ts          — pure: month model builder
+    holidays.ts          — Calendarific API + cache
+  timesheet/
+    timesheet.ts         — Excel template manipulation
+    template-map.ts      — cell position constants
+    pdf.ts               — optional xlsx → PDF (auto-detects LibreOffice)
+  email/
+    email.ts             — AWS SES SMTP
+  utils/
+    template-inspector.ts — utility to verify cell positions
 data/
-  timesheet-data.json  — leave + employee info (you edit this)
-  execution-state.json — tracks last processed month
-  holidays-cache/      — cached holiday data per year
+  timesheet-data.json    — leave + employee info (you edit this)
+  execution-state.json   — tracks last processed month
+  holidays-cache/        — cached holiday data per year
 templates/
   timesheet-template.xlsx — your original template (never modified)
 output/
-  timesheet-YYYY-MM.xlsx  — generated timesheets
+  timesheet-YYYY-MM.{xlsx,pdf} — generated timesheets
 ```
 
 ## Environment Variables
@@ -118,7 +122,7 @@ output/
 
 ## Documentation
 
-- [Architecture & Design](docs/ARCHITECTURE.md)
-- [Configuration Guide](docs/CONFIGURATION.md)
-- [Template Mapping](docs/TEMPLATE-MAPPING.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Architecture & Design](docs/architecture.md)
+- [Configuration Guide](docs/configuration.md)
+- [Template Mapping](docs/template-mapping.md)
+- [Troubleshooting](docs/troubleshooting.md)
