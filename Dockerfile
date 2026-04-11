@@ -15,7 +15,7 @@ FROM node:23-alpine
 
 WORKDIR /app
 
-# LibreOffice for xlsx → pdf conversion
+# LibreOffice for xlsx → PDF conversion (auto-detected at runtime)
 RUN apk add --no-cache libreoffice-calc font-noto font-noto-cjk \
     && rm -rf /var/cache/apk/*
 

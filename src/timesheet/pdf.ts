@@ -9,18 +9,32 @@ const execAsync = promisify(exec);
 const log = createLogger('pdf');
 
 /**
- * Convert an Excel file to PDF using LibreOffice in headless mode.
- *
- * Requires LibreOffice installed:
- *   - Docker: `apk add libreoffice`
- *   - Windows: install LibreOffice and ensure `soffice` is in PATH
- *   - macOS/Linux: `brew install --cask libreoffice` / `apt install libreoffice`
- *
- * @returns Path to the generated PDF file
+ * Check whether LibreOffice (soffice) is available on the system.
  */
-export const convertToPdf = async (xlsxPath: string): Promise<string> => {
+const isLibreOfficeAvailable = async (): Promise<boolean> => {
+  try {
+    const cmd = process.platform === 'win32' ? 'where soffice' : 'which soffice';
+    await execAsync(cmd, { timeout: 5_000 });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Try to convert an Excel file to PDF using LibreOffice headless.
+ * Returns the PDF path if LibreOffice is available, otherwise returns the
+ * original xlsx path unchanged (graceful fallback).
+ */
+export const convertToPdfIfAvailable = async (xlsxPath: string): Promise<string> => {
   if (!existsSync(xlsxPath)) {
     throw new Error(`Excel file not found: ${xlsxPath}`);
+  }
+
+  const available = await isLibreOfficeAvailable();
+  if (!available) {
+    log.warn('LibreOffice not found — will send .xlsx as-is');
+    return xlsxPath;
   }
 
   const outputDir = dirname(xlsxPath);
@@ -37,13 +51,13 @@ export const convertToPdf = async (xlsxPath: string): Promise<string> => {
       log.warn(`LibreOffice stderr: ${stderr}`);
     }
   } catch (err) {
-    throw new Error(
-      `PDF conversion failed. Is LibreOffice installed? Run: soffice --version\n${String(err)}`
-    );
+    log.warn(`PDF conversion failed, sending .xlsx instead: ${String(err)}`);
+    return xlsxPath;
   }
 
   if (!existsSync(pdfPath)) {
-    throw new Error(`PDF conversion produced no output: expected ${pdfPath}`);
+    log.warn(`PDF not produced (expected ${pdfPath}), sending .xlsx instead`);
+    return xlsxPath;
   }
 
   log.info(`PDF created: ${pdfPath}`);

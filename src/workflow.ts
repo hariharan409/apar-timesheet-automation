@@ -9,7 +9,7 @@ import type { AppConfig, TimesheetData } from './config/types.js';
 import { createLogger } from './core/logger.js';
 import { getState, updateState } from './core/state.js';
 import { sendTimesheet } from './email/email.js';
-import { convertToPdf } from './timesheet/pdf.js';
+import { convertToPdfIfAvailable } from './timesheet/pdf.js';
 import { generateTimesheet, calculateLeaveBalances } from './timesheet/timesheet.js';
 
 const log = createLogger('workflow');
@@ -81,15 +81,15 @@ export const executeWorkflow = async (
   // Step 8: Generate timesheet
   const xlsxPath = await generateTimesheet(monthModel, leaveBalances, timesheetData, config);
 
-  // Step 9: Convert to PDF
-  const pdfPath = await convertToPdf(xlsxPath);
+  // Step 9: Convert to PDF if LibreOffice is available, otherwise keep .xlsx
+  const outputPath = await convertToPdfIfAvailable(xlsxPath);
 
   // Step 10: Send email
   try {
-    await sendTimesheet(pdfPath, year, month, timesheetData.employee.name, config);
+    await sendTimesheet(outputPath, year, month, timesheetData.employee.name, config);
   } catch (err) {
     log.error('Email sending failed — timesheet was generated but not sent:', err);
-    log.warn(`You can manually send: ${pdfPath}`);
+    log.warn(`You can manually send: ${outputPath}`);
     // Don't throw — timesheet was generated successfully. State will still update.
   }
 

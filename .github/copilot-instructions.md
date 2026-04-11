@@ -66,7 +66,7 @@ src/
   timesheet/
     timesheet.ts    # ExcelJS template manipulation
     template-map.ts # Excel cell position constants (rows/columns)
-    pdf.ts          # LibreOffice headless xlsx → pdf conversion
+    pdf.ts          # Optional xlsx → PDF conversion (auto-detects LibreOffice)
   email/
     email.ts        # nodemailer + AWS SES SMTP email sending
   utils/
