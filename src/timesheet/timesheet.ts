@@ -3,7 +3,9 @@ import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
 import { format } from 'date-fns';
-import { Workbook } from 'exceljs';
+import ExcelJS from 'exceljs';
+
+const { Workbook } = ExcelJS;
 
 import type { AppConfig, MonthModel, LeaveBalances, TimesheetData } from '../config/types.js';
 import { createLogger } from '../core/logger.js';

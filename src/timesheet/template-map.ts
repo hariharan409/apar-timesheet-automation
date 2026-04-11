@@ -32,28 +32,30 @@ export const ROWS = {
 } as const;
 
 export const COLS = {
-  /** Label column (A) */
-  LABEL: 1,
-  /** Data starts at column B (date 1) */
-  DATA_START: 2,
-  /** Data ends at column AF (date 31) */
-  DATA_END: 32,
-  /** Employee name value */
-  EMPLOYEE_NAME: 3,
-  /** Month name value */
-  MONTH_NAME: 3,
-  /** Year value */
-  YEAR: 6,
-  /** Total working days value */
-  TOTAL_DAYS: 4,
-  /** AL column in leave section */
-  AL: 2,
-  /** ML column in leave section */
-  ML: 3,
-  /** Signature date column */
-  SIGNATURE_DATE: 7,
-  /** Notes label column */
-  NOTES: 16,
+  /** Label column (B) */
+  LABEL: 2,
+  /** Data starts at column C (date 1) */
+  DATA_START: 3,
+  /** Data ends at column AG (date 31) */
+  DATA_END: 33,
+  /** Employee name value (D) */
+  EMPLOYEE_NAME: 4,
+  /** Client location value (D) */
+  CLIENT_LOCATION: 4,
+  /** Month name value (D) */
+  MONTH_NAME: 4,
+  /** Year value (H) */
+  YEAR: 8,
+  /** Total working days value (E) */
+  TOTAL_DAYS: 5,
+  /** AL column in leave section (C) */
+  AL: 3,
+  /** ML column in leave section (D) */
+  ML: 4,
+  /** Signature date column (H) */
+  SIGNATURE_DATE: 8,
+  /** Notes label column (Q) */
+  NOTES: 17,
 } as const;
 
 /** Default working hours per day */

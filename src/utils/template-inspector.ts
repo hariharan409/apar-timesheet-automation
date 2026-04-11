@@ -10,10 +10,12 @@ import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { Workbook } from 'exceljs';
+import ExcelJS from 'exceljs';
+
+const { Workbook } = ExcelJS;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const TEMPLATE_PATH = resolve(__dirname, '..', 'templates', 'timesheet-template.xlsx');
+const TEMPLATE_PATH = resolve(__dirname, '..', '..', 'templates', 'timesheet-template.xlsx');
 
 const inspect = async (): Promise<void> => {
   if (!existsSync(TEMPLATE_PATH)) {

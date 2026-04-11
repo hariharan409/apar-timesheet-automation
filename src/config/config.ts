@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 import type { AppConfig } from './types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const PROJECT_ROOT = resolve(__dirname, '..');
+const PROJECT_ROOT = resolve(__dirname, '..', '..');
 
 const REQUIRED_VARS = [
   'SMTP_HOST',
