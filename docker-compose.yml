@@ -1,11 +1,9 @@
-services:
-  timesheet-automation:
+﻿services:
+  timesheet:
     build: .
     container_name: apar-timesheet
     restart: unless-stopped
     env_file: .env
-    environment:
-      - TZ=Asia/Singapore
     volumes:
       - ./data:/app/data
       - ./templates:/app/templates
