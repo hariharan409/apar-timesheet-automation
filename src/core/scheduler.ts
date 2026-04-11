@@ -1,8 +1,9 @@
 import { format } from 'date-fns';
 import cron from 'node-cron';
 
+import type { AppConfig } from '../config/types.js';
+
 import { createLogger } from './logger.js';
-import type { AppConfig } from './types.js';
 
 const log = createLogger('scheduler');
 

@@ -1,8 +1,9 @@
 import { existsSync } from 'node:fs';
 import { readFile, writeFile, rename } from 'node:fs/promises';
 
+import type { ExecutionState } from '../config/types.js';
+
 import { createLogger } from './logger.js';
-import type { ExecutionState } from './types.js';
 
 const log = createLogger('state');
 

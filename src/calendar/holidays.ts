@@ -2,8 +2,8 @@ import { existsSync } from 'node:fs';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
-import { createLogger } from './logger.js';
-import type { AppConfig, HolidayEntry } from './types.js';
+import type { AppConfig, HolidayEntry } from '../config/types.js';
+import { createLogger } from '../core/logger.js';
 
 const log = createLogger('holidays');
 

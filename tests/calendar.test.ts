@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { buildMonthModel } from '../src/calendar.js';
+import { buildMonthModel } from '../src/calendar/calendar.js';
 
 describe('buildMonthModel', () => {
   it('should generate correct days for March 2026 (31 days)', () => {

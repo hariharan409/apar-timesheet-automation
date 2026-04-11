@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { format } from 'date-fns';
 
-import { loadConfig } from './config.js';
-import { setLogLevel, createLogger } from './logger.js';
-import { startScheduler } from './scheduler.js';
+import { loadConfig } from './config/config.js';
+import { setLogLevel, createLogger } from './core/logger.js';
+import { startScheduler } from './core/scheduler.js';
 import { executeWorkflow, recoverMissedExecutions } from './workflow.js';
 
 const config = loadConfig();

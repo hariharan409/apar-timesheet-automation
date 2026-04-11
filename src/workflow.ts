@@ -3,13 +3,14 @@ import { readFile } from 'node:fs/promises';
 
 import { format, addMonths, parse, isBefore, isEqual } from 'date-fns';
 
-import { buildMonthModel } from './calendar.js';
-import { sendTimesheet } from './email.js';
-import { getHolidays, filterHolidaysForMonth } from './holidays.js';
-import { createLogger } from './logger.js';
-import { getState, updateState } from './state.js';
-import { generateTimesheet, calculateLeaveBalances } from './timesheet.js';
-import type { AppConfig, TimesheetData } from './types.js';
+import { buildMonthModel } from './calendar/calendar.js';
+import { getHolidays, filterHolidaysForMonth } from './calendar/holidays.js';
+import type { AppConfig, TimesheetData } from './config/types.js';
+import { createLogger } from './core/logger.js';
+import { getState, updateState } from './core/state.js';
+import { sendTimesheet } from './email/email.js';
+import { convertToPdf } from './timesheet/pdf.js';
+import { generateTimesheet, calculateLeaveBalances } from './timesheet/timesheet.js';
 
 const log = createLogger('workflow');
 
@@ -78,18 +79,21 @@ export const executeWorkflow = async (
   );
 
   // Step 8: Generate timesheet
-  const outputPath = await generateTimesheet(monthModel, leaveBalances, timesheetData, config);
+  const xlsxPath = await generateTimesheet(monthModel, leaveBalances, timesheetData, config);
 
-  // Step 9: Send email
+  // Step 9: Convert to PDF
+  const pdfPath = await convertToPdf(xlsxPath);
+
+  // Step 10: Send email
   try {
-    await sendTimesheet(outputPath, year, month, timesheetData.employee.name, config);
+    await sendTimesheet(pdfPath, year, month, timesheetData.employee.name, config);
   } catch (err) {
     log.error('Email sending failed — timesheet was generated but not sent:', err);
-    log.warn(`You can manually send: ${outputPath}`);
+    log.warn(`You can manually send: ${pdfPath}`);
     // Don't throw — timesheet was generated successfully. State will still update.
   }
 
-  // Step 10: Update execution state
+  // Step 11: Update execution state
   await updateState(config.paths.executionState, targetMonth);
 
   log.info(`=== Workflow complete: ${targetMonth} ===`);

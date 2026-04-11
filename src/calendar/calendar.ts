@@ -1,7 +1,7 @@
 import { getDaysInMonth, getDay, format } from 'date-fns';
 
-import { DEFAULT_HOURS, MONTH_NAMES_SHORT } from './template-map.js';
-import type { DayEntry, MonthModel } from './types.js';
+import type { DayEntry, MonthModel } from '../config/types.js';
+import { DEFAULT_HOURS, MONTH_NAMES_SHORT } from '../timesheet/template-map.js';
 
 const DAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
 

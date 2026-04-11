@@ -5,9 +5,10 @@ import { resolve } from 'node:path';
 import { format } from 'date-fns';
 import { Workbook } from 'exceljs';
 
-import { createLogger } from './logger.js';
+import type { AppConfig, MonthModel, LeaveBalances, TimesheetData } from '../config/types.js';
+import { createLogger } from '../core/logger.js';
+
 import { ROWS, COLS, MONTH_NAMES_SHORT } from './template-map.js';
-import type { AppConfig, MonthModel, LeaveBalances, TimesheetData } from './types.js';
 
 const log = createLogger('timesheet');
 

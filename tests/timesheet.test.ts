@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-import { calculateLeaveBalances } from '../src/timesheet.js';
-import type { TimesheetData } from '../src/types.js';
+import type { TimesheetData } from '../src/config/types.js';
+import { calculateLeaveBalances } from '../src/timesheet/timesheet.js';
 
 const baseData: TimesheetData = {
   employee: { name: 'Test User', client: 'Test Client' },

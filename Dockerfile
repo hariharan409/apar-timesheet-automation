@@ -15,6 +15,10 @@ FROM node:23-alpine
 
 WORKDIR /app
 
+# LibreOffice for xlsx → pdf conversion
+RUN apk add --no-cache libreoffice-calc font-noto font-noto-cjk \
+    && rm -rf /var/cache/apk/*
+
 # Non-root user for security
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 

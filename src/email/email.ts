@@ -2,9 +2,9 @@ import { basename } from 'node:path';
 
 import nodemailer from 'nodemailer';
 
-import { createLogger } from './logger.js';
-import { MONTH_NAMES_FULL } from './template-map.js';
-import type { AppConfig } from './types.js';
+import type { AppConfig } from '../config/types.js';
+import { createLogger } from '../core/logger.js';
+import { MONTH_NAMES_FULL } from '../timesheet/template-map.js';
 
 const log = createLogger('email');
 

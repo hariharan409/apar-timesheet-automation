@@ -52,18 +52,25 @@ Monthly timesheet automation microservice. Runs on the 1st of every month (or ca
 ```
 src/
   index.ts          # Entry point — loads config, recovery check, starts scheduler
-  config.ts         # Environment variable loading and validation
-  logger.ts         # Structured logging [timestamp] [LEVEL] [module]
-  types.ts          # Central TypeScript interfaces
-  template-map.ts   # Excel cell position constants (rows/columns)
-  calendar.ts       # Pure function — builds month model with day breakdown
-  holidays.ts       # Calendarific API fetch + yearly JSON cache
-  state.ts          # Atomic JSON read/write for execution state tracking
-  timesheet.ts      # ExcelJS template manipulation
-  email.ts          # nodemailer + AWS SES SMTP email sending
-  workflow.ts       # Orchestrator — state → data → holidays → generate → email
-  scheduler.ts      # node-cron wrapper
-  template-inspector.ts  # Dev utility to inspect template cell values
+  workflow.ts       # Orchestrator — state → data → holidays → generate → convert → email
+  config/
+    config.ts       # Environment variable loading and validation
+    types.ts        # Central TypeScript interfaces
+  core/
+    logger.ts       # Structured logging [timestamp] [LEVEL] [module]
+    state.ts        # Atomic JSON read/write for execution state tracking
+    scheduler.ts    # node-cron wrapper
+  calendar/
+    calendar.ts     # Pure function — builds month model with day breakdown
+    holidays.ts     # Calendarific API fetch + yearly JSON cache
+  timesheet/
+    timesheet.ts    # ExcelJS template manipulation
+    template-map.ts # Excel cell position constants (rows/columns)
+    pdf.ts          # LibreOffice headless xlsx → pdf conversion
+  email/
+    email.ts        # nodemailer + AWS SES SMTP email sending
+  utils/
+    template-inspector.ts  # Dev utility to inspect template cell values
 tests/
   calendar.test.ts
   timesheet.test.ts
