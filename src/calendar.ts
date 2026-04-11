@@ -1,8 +1,5 @@
-import {
-  getDaysInMonth,
-  getDay,
-  format,
-} from 'date-fns';
+import { getDaysInMonth, getDay, format } from 'date-fns';
+
 import { DEFAULT_HOURS, MONTH_NAMES_SHORT } from './template-map.js';
 import type { DayEntry, MonthModel } from './types.js';
 
@@ -18,12 +15,12 @@ const DAY_NAMES = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'] as const;
  * @param leaveDates - Map of date string → leave type ('annual' | 'medical')
  * @returns Complete month model with per-day breakdown and aggregates
  */
-export function buildMonthModel(
+export const buildMonthModel = (
   year: number,
   month: number,
   holidays: Map<string, string>,
-  leaveDates: Map<string, 'annual' | 'medical'>,
-): MonthModel {
+  leaveDates: Map<string, 'annual' | 'medical'>
+): MonthModel => {
   const totalDays = getDaysInMonth(new Date(year, month - 1));
   const days: DayEntry[] = [];
 
@@ -31,7 +28,7 @@ export function buildMonthModel(
     const dateObj = new Date(year, month - 1, date);
     const dateStr = format(dateObj, 'yyyy-MM-dd');
     const dayOfWeek = getDay(dateObj);
-    const dayName = DAY_NAMES[dayOfWeek]!;
+    const dayName = DAY_NAMES[dayOfWeek] ?? 'sun';
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
     const isHoliday = holidays.has(dateStr);
     const holidayName = holidays.get(dateStr);
@@ -59,10 +56,10 @@ export function buildMonthModel(
   return {
     year,
     month,
-    monthName: MONTH_NAMES_SHORT[month - 1]!,
+    monthName: MONTH_NAMES_SHORT[month - 1] ?? 'Jan',
     totalDays,
     days,
     totalWorkingDays,
     totalHours,
   };
-}
+};

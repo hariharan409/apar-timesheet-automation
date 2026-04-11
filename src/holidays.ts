@@ -1,6 +1,7 @@
-import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
+
 import { createLogger } from './logger.js';
 import type { AppConfig, HolidayEntry } from './types.js';
 
@@ -21,10 +22,10 @@ interface CalendarificResponse {
  * Uses local cache first, falls back to Calendarific API.
  * Returns a Map of date string → holiday name.
  */
-export async function getHolidays(
+export const getHolidays = async (
   year: number,
-  config: Readonly<AppConfig>,
-): Promise<Map<string, string>> {
+  config: Readonly<AppConfig>
+): Promise<Map<string, string>> => {
   const cacheDir = config.paths.holidaysCache;
   const cachePath = resolve(cacheDir, `${year}.json`);
 
@@ -76,16 +77,16 @@ export async function getHolidays(
     log.warn('No holiday data available — proceeding without holidays');
     return new Map();
   }
-}
+};
 
 /**
  * Filter holidays for a specific month.
  */
-export function filterHolidaysForMonth(
+export const filterHolidaysForMonth = (
   holidays: Map<string, string>,
   year: number,
-  month: number,
-): Map<string, string> {
+  month: number
+): Map<string, string> => {
   const prefix = `${year}-${String(month).padStart(2, '0')}`;
   const filtered = new Map<string, string>();
   for (const [date, name] of holidays) {
@@ -94,8 +95,8 @@ export function filterHolidaysForMonth(
     }
   }
   return filtered;
-}
+};
 
-function toHolidayMap(entries: HolidayEntry[]): Map<string, string> {
+const toHolidayMap = (entries: HolidayEntry[]): Map<string, string> => {
   return new Map(entries.map((h) => [h.date, h.name]));
-}
+};

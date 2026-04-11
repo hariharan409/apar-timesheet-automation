@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { buildMonthModel } from '../src/calendar.js';
 
 describe('buildMonthModel', () => {
@@ -32,14 +33,14 @@ describe('buildMonthModel', () => {
     const model = buildMonthModel(2026, 3, holidays, leaves);
 
     // March 1, 2026 is a Sunday
-    expect(model.days[0]!.dayName).toBe('sun');
-    expect(model.days[0]!.isWeekend).toBe(true);
-    expect(model.days[0]!.hours).toBe(0);
+    expect(model.days[0].dayName).toBe('sun');
+    expect(model.days[0].isWeekend).toBe(true);
+    expect(model.days[0].hours).toBe(0);
 
     // March 2, 2026 is a Monday
-    expect(model.days[1]!.dayName).toBe('mon');
-    expect(model.days[1]!.isWeekend).toBe(false);
-    expect(model.days[1]!.hours).toBe(8);
+    expect(model.days[1].dayName).toBe('mon');
+    expect(model.days[1].isWeekend).toBe(false);
+    expect(model.days[1].hours).toBe(8);
   });
 
   it('should mark holidays as non-working', () => {
@@ -49,10 +50,10 @@ describe('buildMonthModel', () => {
     const model = buildMonthModel(2026, 3, holidays, leaves);
 
     // March 2 is Monday but marked as holiday
-    expect(model.days[1]!.isHoliday).toBe(true);
-    expect(model.days[1]!.holidayName).toBe('Test Holiday');
-    expect(model.days[1]!.isWorking).toBe(false);
-    expect(model.days[1]!.hours).toBe(0);
+    expect(model.days[1].isHoliday).toBe(true);
+    expect(model.days[1].holidayName).toBe('Test Holiday');
+    expect(model.days[1].isWorking).toBe(false);
+    expect(model.days[1].hours).toBe(0);
     expect(model.totalWorkingDays).toBe(21); // 22 - 1 holiday
   });
 
@@ -65,13 +66,13 @@ describe('buildMonthModel', () => {
 
     const model = buildMonthModel(2026, 3, holidays, leaves);
 
-    expect(model.days[2]!.isLeave).toBe(true);
-    expect(model.days[2]!.leaveType).toBe('annual');
-    expect(model.days[2]!.hours).toBe(0);
+    expect(model.days[2].isLeave).toBe(true);
+    expect(model.days[2].leaveType).toBe('annual');
+    expect(model.days[2].hours).toBe(0);
 
-    expect(model.days[3]!.isLeave).toBe(true);
-    expect(model.days[3]!.leaveType).toBe('medical');
-    expect(model.days[3]!.hours).toBe(0);
+    expect(model.days[3].isLeave).toBe(true);
+    expect(model.days[3].leaveType).toBe('medical');
+    expect(model.days[3].hours).toBe(0);
 
     expect(model.totalWorkingDays).toBe(20); // 22 - 2 leaves
   });

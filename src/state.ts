@@ -1,5 +1,6 @@
-import { readFile, writeFile, rename } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { readFile, writeFile, rename } from 'node:fs/promises';
+
 import { createLogger } from './logger.js';
 import type { ExecutionState } from './types.js';
 
@@ -14,7 +15,7 @@ const DEFAULT_STATE: ExecutionState = {
  * Read the current execution state.
  * Returns default state if the file doesn't exist yet.
  */
-export async function getState(statePath: string): Promise<ExecutionState> {
+export const getState = async (statePath: string): Promise<ExecutionState> => {
   if (!existsSync(statePath)) {
     log.info('No execution state found — first run');
     return { ...DEFAULT_STATE };
@@ -22,16 +23,13 @@ export async function getState(statePath: string): Promise<ExecutionState> {
 
   const raw = await readFile(statePath, 'utf-8');
   return JSON.parse(raw) as ExecutionState;
-}
+};
 
 /**
  * Update the execution state with the processed month.
  * Uses atomic write (write to temp → rename) to prevent corruption.
  */
-export async function updateState(
-  statePath: string,
-  month: string,
-): Promise<void> {
+export const updateState = async (statePath: string, month: string): Promise<void> => {
   const state: ExecutionState = {
     lastProcessedMonth: month,
     lastExecutionTimestamp: new Date().toISOString(),
@@ -42,4 +40,4 @@ export async function updateState(
   await rename(tempPath, statePath);
 
   log.info(`State updated: lastProcessedMonth = ${month}`);
-}
+};

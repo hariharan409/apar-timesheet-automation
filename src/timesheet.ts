@@ -1,8 +1,10 @@
-import { Workbook } from 'exceljs';
-import { resolve } from 'node:path';
-import { mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
 import { format } from 'date-fns';
+import { Workbook } from 'exceljs';
+
 import { createLogger } from './logger.js';
 import { ROWS, COLS, MONTH_NAMES_SHORT } from './template-map.js';
 import type { AppConfig, MonthModel, LeaveBalances, TimesheetData } from './types.js';
@@ -16,15 +18,15 @@ const log = createLogger('timesheet');
  *
  * @returns Path to the generated file
  */
-export async function generateTimesheet(
+export const generateTimesheet = async (
   monthModel: MonthModel,
   leaveBalances: LeaveBalances,
   timesheetData: TimesheetData,
-  config: Readonly<AppConfig>,
-): Promise<string> {
+  config: Readonly<AppConfig>
+): Promise<string> => {
   const { year, month, monthName, days, totalWorkingDays } = monthModel;
   const employee = timesheetData.employee;
-  const workMode = timesheetData['work-mode'] || 'wfh';
+  const workMode: string = timesheetData['work-mode'];
   const monthKey = `${year}-${String(month).padStart(2, '0')}`;
   const monthData = timesheetData.months[monthKey];
 
@@ -33,7 +35,7 @@ export async function generateTimesheet(
   // Load template
   const workbook = new Workbook();
   await workbook.xlsx.readFile(config.paths.template);
-  const sheet = workbook.worksheets[0];
+  const sheet = workbook.worksheets.at(0);
   if (!sheet) {
     throw new Error('Template has no worksheets');
   }
@@ -43,14 +45,14 @@ export async function generateTimesheet(
   setCellValue(sheet, ROWS.YEAR, COLS.YEAR, year);
 
   // ── Date numbers (row 10) & Day names (row 11) ────
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   for (let col = COLS.DATA_START; col <= COLS.DATA_END; col++) {
     const dayIndex = col - COLS.DATA_START;
-    if (dayIndex < days.length) {
-      const day = days[dayIndex]!;
+    const day = days.at(dayIndex);
+    if (day) {
       setCellValue(sheet, ROWS.DATE_NUMBERS, col, day.date);
       setCellValue(sheet, ROWS.DAY_NAMES, col, day.dayName);
 
-      // Hours: WFH or WFO row based on work-mode
       const hoursRow = workMode === 'wfo' ? ROWS.WFO_HOURS : ROWS.WFH_HOURS;
       const otherRow = workMode === 'wfo' ? ROWS.WFH_HOURS : ROWS.WFO_HOURS;
       setCellValue(sheet, hoursRow, col, day.hours > 0 ? day.hours : null);
@@ -70,9 +72,9 @@ export async function generateTimesheet(
   // ── Leave section ──────────────────────────────────
   const alAllocation = timesheetData['annual-leave-allocation'];
   const mlAllocation = timesheetData['medical-leave-allocation'];
-  const alUsedThisMonth = monthData?.['annual-leave-dates']?.length ?? 0;
-  const mlUsedThisMonth = monthData?.['medical-leave-dates']?.length ?? 0;
-  const compOff = monthData?.['comp-off'] ?? 0;
+  const alUsedThisMonth = monthData ? monthData['annual-leave-dates'].length : 0;
+  const mlUsedThisMonth = monthData ? monthData['medical-leave-dates'].length : 0;
+  const compOff = monthData ? monthData['comp-off'] : 0;
 
   // Row 17: Leave eligibility
   setCellValue(sheet, ROWS.LEAVE_ELIGIBILITY, COLS.AL, alAllocation);
@@ -117,15 +119,15 @@ export async function generateTimesheet(
 
   log.info(`Timesheet saved: ${outputPath}`);
   return outputPath;
-}
+};
 
 /**
  * Calculate cumulative leave balances up to and including the target month.
  */
-export function calculateLeaveBalances(
+export const calculateLeaveBalances = (
   timesheetData: TimesheetData,
-  targetMonth: string,
-): LeaveBalances {
+  targetMonth: string
+): LeaveBalances => {
   const alAllocation = timesheetData['annual-leave-allocation'];
   const mlAllocation = timesheetData['medical-leave-allocation'];
   let annualLeaveUsed = 0;
@@ -135,9 +137,11 @@ export function calculateLeaveBalances(
   const sortedMonths = Object.keys(timesheetData.months).sort();
   for (const monthKey of sortedMonths) {
     if (monthKey > targetMonth) break;
-    const monthData = timesheetData.months[monthKey]!;
-    annualLeaveUsed += monthData['annual-leave-dates']?.length ?? 0;
-    medicalLeaveUsed += monthData['medical-leave-dates']?.length ?? 0;
+    const monthData = timesheetData.months[monthKey];
+    if (monthData) {
+      annualLeaveUsed += monthData['annual-leave-dates'].length;
+      medicalLeaveUsed += monthData['medical-leave-dates'].length;
+    }
   }
 
   return {
@@ -146,30 +150,30 @@ export function calculateLeaveBalances(
     annualLeavePending: alAllocation - annualLeaveUsed,
     medicalLeavePending: mlAllocation - medicalLeaveUsed,
   };
-}
+};
 
 // ── Helpers ────────────────────────────────────────────
 
-function setCellValue(
+const setCellValue = (
   sheet: import('exceljs').Worksheet,
   row: number,
   col: number,
-  value: string | number | null,
-): void {
+  value: string | number | null
+): void => {
   const cell = sheet.getCell(row, col);
   cell.value = value as import('exceljs').CellValue;
-}
+};
 
 /**
  * Replace month names in existing label text.
  * e.g., "Total Leave Eligibility in the Mar 2026" → "Total Leave Eligibility in the Apr 2026"
  */
-function updateMonthInLabel(
+const updateMonthInLabel = (
   sheet: import('exceljs').Worksheet,
   row: number,
   monthName: string,
-  year?: number,
-): void {
+  year?: number
+): void => {
   const cell = sheet.getCell(row, COLS.LABEL);
   const currentValue = cell.value;
   if (typeof currentValue !== 'string') return;
@@ -182,4 +186,4 @@ function updateMonthInLabel(
     updated = updated.replace(/\d{4}/, String(year));
   }
   cell.value = updated;
-}
+};

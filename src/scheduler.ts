@@ -1,5 +1,6 @@
-import cron from 'node-cron';
 import { format } from 'date-fns';
+import cron from 'node-cron';
+
 import { createLogger } from './logger.js';
 import type { AppConfig } from './types.js';
 
@@ -11,10 +12,10 @@ const log = createLogger('scheduler');
  * @param config - Application configuration
  * @param workflowFn - The workflow function to execute on trigger
  */
-export function startScheduler(
+export const startScheduler = (
   config: Readonly<AppConfig>,
-  workflowFn: (targetMonth: string) => Promise<boolean>,
-): void {
+  workflowFn: (targetMonth: string) => Promise<boolean>
+): void => {
   const schedule = config.cronSchedule;
 
   if (!cron.validate(schedule)) {
@@ -23,18 +24,16 @@ export function startScheduler(
 
   cron.schedule(
     schedule,
-    async () => {
+    () => {
       const targetMonth = format(new Date(), 'yyyy-MM');
       log.info(`Cron triggered — executing workflow for ${targetMonth}`);
-      try {
-        await workflowFn(targetMonth);
-      } catch (err) {
+      workflowFn(targetMonth).catch((err: unknown) => {
         log.error('Scheduled workflow failed:', err);
-      }
+      });
     },
-    { timezone: config.timezone },
+    { timezone: config.timezone }
   );
 
   log.info(`Scheduler started: "${schedule}" (timezone: ${config.timezone})`);
   log.info('Next execution: 1st of next month at configured time');
-}
+};

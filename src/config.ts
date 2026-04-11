@@ -1,5 +1,6 @@
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
 import type { AppConfig } from './types.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -19,7 +20,7 @@ const REQUIRED_VARS = [
  * Load and validate all configuration from environment variables.
  * Fails fast with a clear error if any required variable is missing.
  */
-export function loadConfig(): Readonly<AppConfig> {
+export const loadConfig = (): Readonly<AppConfig> => {
   const missing = REQUIRED_VARS.filter((key) => !process.env[key]);
   if (missing.length > 0) {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
@@ -51,4 +52,4 @@ export function loadConfig(): Readonly<AppConfig> {
       template: resolve(PROJECT_ROOT, 'templates', 'timesheet-template.xlsx'),
     }),
   });
-}
+};

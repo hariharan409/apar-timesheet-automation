@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { format } from 'date-fns';
+
 import { loadConfig } from './config.js';
 import { setLogLevel, createLogger } from './logger.js';
 import { startScheduler } from './scheduler.js';
@@ -10,7 +11,7 @@ setLogLevel(config.logLevel);
 
 const log = createLogger('main');
 
-async function main(): Promise<void> {
+const main = async (): Promise<void> => {
   log.info('╔══════════════════════════════════════════╗');
   log.info('║  Apar Timesheet Automation — Starting    ║');
   log.info('╚══════════════════════════════════════════╝');
@@ -21,8 +22,8 @@ async function main(): Promise<void> {
 
   if (isRunNow) {
     // Manual trigger mode — run for current month and exit
-    const targetMonth = process.argv[process.argv.indexOf('--run-now') + 1]
-      || format(new Date(), 'yyyy-MM');
+    const targetMonth =
+      process.argv[process.argv.indexOf('--run-now') + 1] || format(new Date(), 'yyyy-MM');
     log.info(`Manual trigger: generating for ${targetMonth}`);
     await executeWorkflow(targetMonth, config);
     log.info('Manual run complete — exiting');
@@ -36,7 +37,7 @@ async function main(): Promise<void> {
   startScheduler(config, (targetMonth) => executeWorkflow(targetMonth, config));
 
   log.info('Service is running. Press Ctrl+C to stop.');
-}
+};
 
 main().catch((err) => {
   log.error('Fatal error:', err);

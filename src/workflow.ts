@@ -1,12 +1,14 @@
-import { readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
+
 import { format, addMonths, parse, isBefore, isEqual } from 'date-fns';
-import { createLogger } from './logger.js';
+
 import { buildMonthModel } from './calendar.js';
-import { getHolidays, filterHolidaysForMonth } from './holidays.js';
-import { generateTimesheet, calculateLeaveBalances } from './timesheet.js';
 import { sendTimesheet } from './email.js';
+import { getHolidays, filterHolidaysForMonth } from './holidays.js';
+import { createLogger } from './logger.js';
 import { getState, updateState } from './state.js';
+import { generateTimesheet, calculateLeaveBalances } from './timesheet.js';
 import type { AppConfig, TimesheetData } from './types.js';
 
 const log = createLogger('workflow');
@@ -19,15 +21,15 @@ const log = createLogger('workflow');
  * @param config - Application configuration
  * @returns true if executed, false if skipped
  */
-export async function executeWorkflow(
+export const executeWorkflow = async (
   targetMonth: string,
-  config: Readonly<AppConfig>,
-): Promise<boolean> {
+  config: Readonly<AppConfig>
+): Promise<boolean> => {
   log.info(`=== Workflow start: ${targetMonth} ===`);
 
   // Step 1: Check execution state
   const state = await getState(config.paths.executionState);
-  if (state.lastProcessedMonth && state.lastProcessedMonth >= targetMonth) {
+  if (state.lastProcessedMonth !== null && state.lastProcessedMonth >= targetMonth) {
     log.info(`Month ${targetMonth} already processed — skipping`);
     return false;
   }
@@ -36,9 +38,9 @@ export async function executeWorkflow(
   if (!existsSync(config.paths.timesheetData)) {
     throw new Error(`Timesheet data file not found: ${config.paths.timesheetData}`);
   }
-  const timesheetData: TimesheetData = JSON.parse(
-    await readFile(config.paths.timesheetData, 'utf-8'),
-  );
+  const timesheetData = JSON.parse(
+    await readFile(config.paths.timesheetData, 'utf-8')
+  ) as TimesheetData;
   log.info('Timesheet data loaded');
 
   // Step 3: Parse target month
@@ -55,10 +57,10 @@ export async function executeWorkflow(
   const monthData = timesheetData.months[targetMonth];
   const leaveDates = new Map<string, 'annual' | 'medical'>();
   if (monthData) {
-    for (const dateStr of monthData['annual-leave-dates'] ?? []) {
+    for (const dateStr of monthData['annual-leave-dates']) {
       leaveDates.set(dateStr, 'annual');
     }
-    for (const dateStr of monthData['medical-leave-dates'] ?? []) {
+    for (const dateStr of monthData['medical-leave-dates']) {
       leaveDates.set(dateStr, 'medical');
     }
   }
@@ -66,13 +68,13 @@ export async function executeWorkflow(
   // Step 6: Build calendar model
   const monthModel = buildMonthModel(year, month, monthHolidays, leaveDates);
   log.info(
-    `Calendar: ${monthModel.totalDays} days, ${monthModel.totalWorkingDays} working, ${leaveDates.size} leave`,
+    `Calendar: ${monthModel.totalDays} days, ${monthModel.totalWorkingDays} working, ${leaveDates.size} leave`
   );
 
   // Step 7: Calculate leave balances
   const leaveBalances = calculateLeaveBalances(timesheetData, targetMonth);
   log.info(
-    `Leave balances: AL pending=${leaveBalances.annualLeavePending}, ML pending=${leaveBalances.medicalLeavePending}`,
+    `Leave balances: AL pending=${leaveBalances.annualLeavePending}, ML pending=${leaveBalances.medicalLeavePending}`
   );
 
   // Step 8: Generate timesheet
@@ -92,15 +94,13 @@ export async function executeWorkflow(
 
   log.info(`=== Workflow complete: ${targetMonth} ===`);
   return true;
-}
+};
 
 /**
  * Check for missed executions and run workflow for each missed month.
  * Called on service startup for recovery.
  */
-export async function recoverMissedExecutions(
-  config: Readonly<AppConfig>,
-): Promise<void> {
+export const recoverMissedExecutions = async (config: Readonly<AppConfig>): Promise<void> => {
   const state = await getState(config.paths.executionState);
   const now = new Date();
   const currentMonth = format(now, 'yyyy-MM');
@@ -120,12 +120,11 @@ export async function recoverMissedExecutions(
   let cursor = parse(state.lastProcessedMonth, 'yyyy-MM', new Date());
   const currentDate = parse(currentMonth, 'yyyy-MM', new Date());
 
-  while (true) {
-    cursor = addMonths(cursor, 1);
-    if (!isBefore(cursor, currentDate) && !isEqual(cursor, currentDate)) break;
-
+  cursor = addMonths(cursor, 1);
+  while (isBefore(cursor, currentDate) || isEqual(cursor, currentDate)) {
     const monthKey = format(cursor, 'yyyy-MM');
     log.warn(`Recovery: processing missed month ${monthKey}`);
     await executeWorkflow(monthKey, config);
+    cursor = addMonths(cursor, 1);
   }
-}
+};

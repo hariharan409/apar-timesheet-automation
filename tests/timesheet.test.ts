@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import { calculateLeaveBalances } from '../src/timesheet.js';
 import type { TimesheetData } from '../src/types.js';
 
@@ -9,7 +10,11 @@ const baseData: TimesheetData = {
   'work-mode': 'wfh',
   months: {
     '2026-01': { 'annual-leave-dates': ['2026-01-05'], 'medical-leave-dates': [], 'comp-off': 0 },
-    '2026-02': { 'annual-leave-dates': ['2026-02-10', '2026-02-11'], 'medical-leave-dates': ['2026-02-20'], 'comp-off': 0 },
+    '2026-02': {
+      'annual-leave-dates': ['2026-02-10', '2026-02-11'],
+      'medical-leave-dates': ['2026-02-20'],
+      'comp-off': 0,
+    },
     '2026-03': { 'annual-leave-dates': [], 'medical-leave-dates': [], 'comp-off': 0 },
   },
 };

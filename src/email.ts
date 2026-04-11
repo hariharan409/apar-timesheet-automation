@@ -1,5 +1,7 @@
-import nodemailer from 'nodemailer';
 import { basename } from 'node:path';
+
+import nodemailer from 'nodemailer';
+
 import { createLogger } from './logger.js';
 import { MONTH_NAMES_FULL } from './template-map.js';
 import type { AppConfig } from './types.js';
@@ -14,14 +16,14 @@ interface SendResult {
 /**
  * Send the generated timesheet via email using AWS SES SMTP.
  */
-export async function sendTimesheet(
+export const sendTimesheet = async (
   filePath: string,
   year: number,
   month: number,
   employeeName: string,
-  config: Readonly<AppConfig>,
-): Promise<SendResult> {
-  const monthName = MONTH_NAMES_FULL[month - 1]!;
+  config: Readonly<AppConfig>
+): Promise<SendResult> => {
+  const monthName = MONTH_NAMES_FULL[month - 1] ?? 'January';
   const subject = `Timesheet - ${monthName} ${year} - ${employeeName}`;
 
   log.info(`Sending email: "${subject}" to ${config.email.to}`);
@@ -51,4 +53,4 @@ export async function sendTimesheet(
 
   log.info(`Email sent successfully. MessageId: ${info.messageId}`);
   return { success: true, messageId: info.messageId };
-}
+};

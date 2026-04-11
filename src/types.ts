@@ -71,7 +71,7 @@ export interface TimesheetData {
   'annual-leave-allocation': number;
   'medical-leave-allocation': number;
   'work-mode': 'wfh' | 'wfo';
-  months: Record<string, MonthLeaveData>;
+  months: Partial<Record<string, MonthLeaveData>>;
 }
 
 export interface ExecutionState {

@@ -6,15 +6,16 @@
  *
  * Usage: npm run inspect-template
  */
-import { Workbook } from 'exceljs';
+import { existsSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { existsSync } from 'node:fs';
+
+import { Workbook } from 'exceljs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_PATH = resolve(__dirname, '..', 'templates', 'timesheet-template.xlsx');
 
-async function inspect(): Promise<void> {
+const inspect = async (): Promise<void> => {
   if (!existsSync(TEMPLATE_PATH)) {
     console.error(`Template not found: ${TEMPLATE_PATH}`);
     console.error('Copy your template to: templates/timesheet-template.xlsx');
@@ -27,9 +28,13 @@ async function inspect(): Promise<void> {
   console.log(`\n📊 Template: ${TEMPLATE_PATH}`);
   console.log(`   Sheets: ${workbook.worksheets.map((s) => s.name).join(', ')}\n`);
 
-  const sheet = workbook.worksheets[0]!;
+  const sheet = workbook.worksheets.at(0);
+  if (!sheet) {
+    console.error('No worksheets found in template');
+    process.exit(1);
+  }
   console.log(`── Sheet: "${sheet.name}" ──`);
-  console.log(`   Rows: ${sheet.rowCount}, Columns: ${sheet.columnCount}\n`);
+  console.log(`   Rows: ${String(sheet.rowCount)}, Columns: ${String(sheet.columnCount)}\n`);
 
   // Print first 35 rows with cell values
   const ROWS_TO_INSPECT = 35;
@@ -42,7 +47,7 @@ async function inspect(): Promise<void> {
       const val = cell.value;
       if (val !== null && val !== undefined && val !== '') {
         const colLetter = String.fromCharCode(64 + col);
-        cells.push(`${colLetter}${row}="${val}"`);
+        cells.push(`${colLetter}${String(row)}="${String(val)}"`);
       }
     }
     if (cells.length > 0) {
@@ -52,12 +57,15 @@ async function inspect(): Promise<void> {
 
   // Check for images
   const images = sheet.getImages();
-  console.log(`\n  Images: ${images.length} found`);
+  console.log(`\n  Images: ${String(images.length)} found`);
   for (const img of images) {
-    console.log(`    - Image at range: tl=${JSON.stringify(img.range?.tl)}, br=${JSON.stringify(img.range?.br)}`);
+    const range = img.range;
+    console.log(
+      `    - Image at range: tl=${JSON.stringify(range.tl)}, br=${JSON.stringify(range.br)}`
+    );
   }
 
   console.log('\n✅ Inspection complete. Compare with src/template-map.ts constants.');
-}
+};
 
 inspect().catch(console.error);

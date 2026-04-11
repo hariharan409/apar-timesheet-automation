@@ -5,11 +5,11 @@ let globalLevel = 'info';
 /**
  * Set the global log level.
  */
-export function setLogLevel(level: string): void {
-  if (LOG_LEVELS[level] !== undefined) {
+export const setLogLevel = (level: string): void => {
+  if (level in LOG_LEVELS) {
     globalLevel = level;
   }
-}
+};
 
 export interface Logger {
   error: (msg: string, ...args: unknown[]) => void;
@@ -22,13 +22,13 @@ export interface Logger {
  * Create a scoped logger instance for a module.
  * Format: [YYYY-MM-DD HH:mm:ss] [LEVEL] [module] message
  */
-export function createLogger(moduleName: string): Logger {
+export const createLogger = (moduleName: string): Logger => {
   const timestamp = (): string => {
     return new Date().toISOString().replace('T', ' ').slice(0, 19);
   };
 
   const shouldLog = (level: string): boolean =>
-    LOG_LEVELS[level]! <= LOG_LEVELS[globalLevel]!;
+    (LOG_LEVELS[level] ?? 0) <= (LOG_LEVELS[globalLevel] ?? 0);
 
   const format = (level: string, msg: string, ...args: unknown[]): unknown[] => {
     const prefix = `[${timestamp()}] [${level.toUpperCase()}] [${moduleName}]`;
@@ -49,4 +49,4 @@ export function createLogger(moduleName: string): Logger {
       if (shouldLog('debug')) console.log(...format('debug', msg, ...args));
     },
   };
-}
+};

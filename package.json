@@ -7,13 +7,19 @@
     "node": ">=23.0.0"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc -p tsconfig.build.json",
     "start": "node dist/index.js",
     "dev": "nodemon --exec tsx src/index.ts",
     "run-now": "tsx src/index.ts --run-now",
     "inspect-template": "tsx src/template-inspector.ts",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts --format stylish",
+    "lint:fix": "eslint . --ext .ts --fix --format stylish",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
+    "prepare": "husky"
   },
   "dependencies": {
     "date-fns": "^4.1.0",
@@ -26,9 +32,23 @@
     "@types/node": "^22.13.10",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.2",
     "nodemon": "^3.1.9",
+    "prettier": "^3.8.1",
     "tsx": "^4.19.3",
     "typescript": "^5.8.2",
     "vitest": "^3.1.1"
+  },
+  "lint-staged": {
+    "*.ts": [
+      "eslint --fix --format stylish",
+      "prettier --write"
+    ]
   }
 }
