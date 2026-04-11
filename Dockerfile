@@ -1,4 +1,4 @@
-FROM node:23-alpine AS builder
+FROM node:23-slim AS builder
 
 WORKDIR /app
 
@@ -11,19 +11,20 @@ COPY src/ ./src/
 RUN npm run build
 
 # ── Production stage ──────────────────────────────────
-FROM node:23-alpine
+FROM node:23-slim
 
 WORKDIR /app
 
 # LibreOffice for xlsx → PDF conversion (auto-detected at runtime)
-RUN apk add --no-cache libreoffice-calc font-noto font-noto-cjk \
-    && rm -rf /var/cache/apk/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libreoffice-calc fonts-noto-core \
+    && rm -rf /var/lib/apt/lists/*
 
 # Non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev && npm cache clean --force
+RUN npm ci --omit=dev --ignore-scripts && npm cache clean --force
 
 COPY --from=builder /app/dist ./dist/
 
